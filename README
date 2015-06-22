@@ -11,4 +11,7 @@ Para compilar el boot_sec:
 
 nasm boot_sec.asm -f bin -o boot_sec.bin
 
+Juntar ambos binarios:
+
+cat boot_sec.bin kernel.bin > os-image
 
