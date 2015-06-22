@@ -7,3 +7,8 @@ gcc -ffreestanding -m32 -c kernel.c -o kernel.o
 
 ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary -melf_i386
 
+Para compilar el boot_sec:
+
+nasm boot_sec.asm -f bin -o boot_sec.bin
+
+
