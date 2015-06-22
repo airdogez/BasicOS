@@ -1,0 +1,9 @@
+Instrucciones para compilar en una maquina 64bits
+
+Para poder compilar el kernel en modo 32 bits se deben usar los siguentes
+commandos
+
+gcc -ffreestanding -m32 -c kernel.c -o kernel.o
+
+ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary -melf_i386
+
