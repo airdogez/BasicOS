@@ -1,29 +1,38 @@
+#Generar listas de fuente para usar en las wildcards
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h)
+
+#Convierte los archivos *.c a *.o para la lista de objectos a construir
+OBJ = ${C_SOURCES:.c=.o}
+
+#Default build target
 all: os-image
 
 run: all
 	bochs
 
 #Combina los archivos binarios y genera la imagen final
-os-image: boot_sec.bin kernel.bin
+os-image: boot/boot_sec.bin kernel.bin
 	cat $^ > os-image
 
 #Build kernel bin
-kernel.bin: kernel_entry.o kernel.o
-	ld -o kernel.bin -Ttext 0x1000 $^ --oformat binary -melf_i386
+kernel.bin: kernel/kernel_entry.o ${OBJ}
+	ld -o $@ -Ttext 0x1000 $^ --oformat binary -melf_i386
 
 #Build kernel object file
-kernel.o: kernel.c
+%.o : %.c ${HEADERS}
 	gcc -ffreestanding -m32 -c $< -o $@
 
 #Build kernel entry object file
-kernel_entry.o: kernel_entry.asm
+%.o : %.asm
 	nasm $< -f elf -o  $@
 
-boot_sec.bin : boot_sec.asm
-	nasm $< -f bin -o $@
+%.bin : %.asm
+	nasm $< -f bin -I 'boot/' -o $@
 
 clean:
-	rm -fr *.bin *.dis *.o os-image *.map
+	rm -fr *.bin *.dis *.o os-image
+	rm -fr kernel/*.o boot/*.bin drivers/*.o
 
 kernel.dis : kernel.bin
 	ndisasm -b 32 $< > $@
